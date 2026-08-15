@@ -16,9 +16,9 @@
 
 ## Git
 
-- コミットは意味のある単位で分け、メッセージは Conventional Commits 形式
-  (`feat:` / `fix:` / `docs:` / `chore:` など)を使う。
-- main / master ブランチには直接コミットせず、作業ブランチを切る。
+Git 操作(ブランチ・コミット・プッシュ・PR)はすべて以下のルールに従う:
+
+@~/.claude/rules/git.md
 
 ## その他
 

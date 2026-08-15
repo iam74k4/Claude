@@ -11,7 +11,9 @@ $BackupDir = Join-Path $ClaudeDir ("backup-" + (Get-Date -Format "yyyyMMdd-HHmms
 $Targets = @(
     @{ Src = "claude\CLAUDE.md";     Dst = "CLAUDE.md" },
     @{ Src = "claude\settings.json"; Dst = "settings.json" },
-    @{ Src = "claude\commands";      Dst = "commands" }
+    @{ Src = "claude\commands";      Dst = "commands" },
+    @{ Src = "claude\rules";         Dst = "rules" },
+    @{ Src = "claude\skills";        Dst = "skills" }
 )
 
 New-Item -ItemType Directory -Force -Path $ClaudeDir | Out-Null

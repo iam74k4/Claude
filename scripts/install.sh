@@ -13,6 +13,8 @@ TARGETS=(
   "claude/CLAUDE.md:CLAUDE.md"
   "claude/settings.json:settings.json"
   "claude/commands:commands"
+  "claude/rules:rules"
+  "claude/skills:skills"
 )
 
 mkdir -p "$CLAUDE_DIR"

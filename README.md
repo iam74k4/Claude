@@ -24,6 +24,11 @@ Claude を使う全環境(Claude Code / Claude Desktop / iOS アプリ)の設定
 claude/                      ← ~/.claude/ に配置する内容(Claude Code 用)
   CLAUDE.md                  ← ユーザーレベルのグローバルメモリ(全プロジェクト共通の指示)
   settings.json              ← 共有する settings(permissions など)
+  rules/                     ← 常時適用ルール(CLAUDE.md からインポートされる)
+    git.md                   ← Git ルール(ブランチ・コミット・PR の規約)
+  skills/                    ← グローバルスキル(該当タスク時に自動発動)
+    git-commit/SKILL.md      ← コミット作成の手順スキル
+    git-pr/SKILL.md          ← PR 作成の手順スキル
   commands/                  ← カスタムスラッシュコマンド
     review.md
 claude-ai/
@@ -34,6 +39,24 @@ scripts/
   install.sh                 ← macOS / Linux 用インストーラ(シンボリックリンク作成)
   install.ps1                ← Windows 用インストーラ
 ```
+
+## ルールとスキルの仕組み(Main workspace として常時参照される理由)
+
+インストーラが `~/.claude/` にリンクを張ることで、**どのリポジトリで開発していても**
+Claude Code は常にこのリポジトリの内容を参照します:
+
+- **`claude/rules/*.md`(ルール)** — `claude/CLAUDE.md` が `@~/.claude/rules/git.md` の形で
+  インポートしており、**全プロジェクトのすべての会話に常時読み込まれる**。
+  「常に守ってほしい規約」はここに書く。
+- **`claude/skills/<name>/SKILL.md`(スキル)** — 常時読み込まれるのは説明文だけで、
+  **該当するタスク(コミット作成、PR 作成など)のときに本文が自動で読み込まれる**。
+  「特定の作業の詳しい手順」はここに書く。
+- ルールを増やすときは `claude/rules/` に Markdown を追加し、`claude/CLAUDE.md` に
+  `@~/.claude/rules/<ファイル名>.md` の 1 行を足す。
+- スキルを増やすときは `claude/skills/<スキル名>/SKILL.md` を追加するだけでよい
+  (frontmatter の `description` がいつ発動するかの条件になる)。
+
+いずれも commit → 各マシンで `git pull` すれば即座に全プロジェクトへ反映されます。
 
 ## セットアップ手順
 
