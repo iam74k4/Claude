@@ -1,0 +1,5 @@
+# Windows の core.autocrlf 設定に関係なく、シェルスクリプトは常に LF で
+# チェックアウトする(CRLF だと bash が実行できず SessionStart フックが壊れる)
+* text=auto
+*.sh text eol=lf
+*.ps1 text eol=crlf
