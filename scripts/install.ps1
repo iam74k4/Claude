@@ -13,7 +13,8 @@ $Targets = @(
     @{ Src = "dot-claude\settings.json"; Dst = "settings.json" },
     @{ Src = "dot-claude\commands";      Dst = "commands" },
     @{ Src = "dot-claude\rules";         Dst = "rules" },
-    @{ Src = "dot-claude\skills";        Dst = "skills" }
+    @{ Src = "dot-claude\skills";        Dst = "skills" },
+    @{ Src = "dot-claude\agents";        Dst = "agents" }
 )
 
 New-Item -ItemType Directory -Force -Path $ClaudeDir | Out-Null

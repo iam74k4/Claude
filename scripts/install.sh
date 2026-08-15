@@ -15,6 +15,7 @@ TARGETS=(
   "dot-claude/commands:commands"
   "dot-claude/rules:rules"
   "dot-claude/skills:skills"
+  "dot-claude/agents:agents"
 )
 
 mkdir -p "$CLAUDE_DIR"

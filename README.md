@@ -30,6 +30,10 @@ dot-claude/                  ← ~/.claude/ に配置する内容(Claude Code �
   skills/                    ← グローバルスキル(該当タスク時に自動発動)
     git-commit/SKILL.md      ← コミット作成の手順スキル
     git-pr/SKILL.md          ← PR 作成の手順スキル
+  agents/                    ← カスタムサブエージェント(委譲される専門役)
+    code-reviewer.md         ← 変更差分のレビュー(読み取り専用)
+    debugger.md              ← エラー・不具合の原因調査と最小修正
+    test-runner.md           ← テスト実行・失敗分析・修正
   commands/                  ← カスタムスラッシュコマンド
     review.md
 claude-ai/
@@ -59,10 +63,15 @@ Claude Code は常にこのリポジトリの内容を参照します:
   `@~/.claude/rules/<ファイル名>.md` の 1 行を足す。
 - スキルを増やすときは `dot-claude/skills/<スキル名>/SKILL.md` を追加するだけでよい
   (frontmatter の `description` がいつ発動するかの条件になる)。
+- **`dot-claude/agents/<name>.md`(サブエージェント)** — 特定の役割(レビュー、デバッグ等)を
+  **独立したコンテキストで実行する専門エージェント**。メイン会話を汚さずに重い調査・検証を
+  任せられる。frontmatter の `description` に該当する作業が来ると自動で委譲されるほか、
+  「code-reviewer でレビューして」のように名指しでも呼べる。`tools` で使えるツールを
+  絞れる(例: code-reviewer は読み取り専用)。追加はファイルを 1 つ置くだけでよい。
 
 いずれも commit → 各マシンで `git pull` すれば即座に全プロジェクトへ反映されます。
 
-> **設計上の割り切り**: `rules/` `skills/` `commands/` はディレクトリごとシンボリックリンク
+> **設計上の割り切り**: `rules/` `skills/` `agents/` `commands/` はディレクトリごとシンボリックリンク
 > するため、マシン固有(Git 管理外)のスキルやコマンドを置く場所は意図的にありません。
 > すべてこのリポジトリで管理します。マシン固有にできるのは `~/.claude/settings.local.json`
 > (permissions 等の上書き)だけです。
@@ -89,7 +98,7 @@ powershell -ExecutionPolicy Bypass -File $HOME\claude-config\scripts\install.ps1
 ```
 
 スクリプトは `~/.claude/` 内の `CLAUDE.md` / `settings.json` / `commands/` / `rules/` /
-`skills/` をこのリポジトリへのシンボリックリンクに置き換えます(既存ファイルはバックアップされます)。
+`skills/` / `agents/` をこのリポジトリへのシンボリックリンクに置き換えます(既存ファイルはバックアップされます)。
 以後、設定を変えたらこのリポジトリで commit → 他マシンで `git pull` するだけで同期されます。
 リポジトリ側でディレクトリ構成が変わった場合(リンク先が切れた場合)は、
 `git pull` 後にインストーラを再実行すればリンクが張り直されます。
@@ -131,7 +140,7 @@ MCP は `claude mcp add --scope user` で追加します(`~/.claude.json` に保
 |------|:---:|:---:|:---:|
 | `~/.claude/CLAUDE.md`(グローバルメモリ) | ✅ | ❌ | ❌ |
 | `~/.claude/settings.json` | ✅ | ❌ | ❌ |
-| カスタムコマンド / スキル(`~/.claude/`) | ✅ | ❌ | ❌ |
+| カスタムコマンド / スキル / サブエージェント(`~/.claude/`) | ✅ | ❌ | ❌ |
 | claude.ai の個人設定(プロファイル) | ❌ | ✅(同期) | ✅(同期) |
 | claude.ai の Projects / メモリ / コネクタ | ❌ | ✅(同期) | ✅(同期) |
 | `claude_desktop_config.json`(MCP) | ❌ | ✅(手動配置) | ❌ |
