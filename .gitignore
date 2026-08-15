@@ -1,6 +1,3 @@
-# マシン固有の settings(リポジトリ管理外)
-settings.local.json
-
 # インストーラのバックアップがリポジトリ内に作られた場合
 backup-*/
 

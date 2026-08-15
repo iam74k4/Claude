@@ -117,10 +117,11 @@ powershell -ExecutionPolicy Bypass -File $HOME\claude-config\scripts\install.ps1
 ```
 
 スクリプトは `~/.claude/` 内の `CLAUDE.md` / `settings.json` / `commands/` / `rules/` /
-`skills/` / `agents/` をこのリポジトリへのシンボリックリンクに置き換えます(既存ファイルはバックアップされます)。
-以後、設定を変えたらこのリポジトリで commit → 他マシンで `git pull` するだけで同期されます。
-リポジトリ側でディレクトリ構成が変わった場合(リンク先が切れた場合)は、
-`git pull` 後にインストーラを再実行すればリンクが張り直されます。
+`skills/` / `agents/` / `hooks/` をこのリポジトリへのシンボリックリンクに置き換えます
+(既存ファイルはバックアップされます)。
+以後、設定を変えて commit & push すれば、他マシンには**次のセッション開始時に自動反映**されます
+(後述の SessionStart フック)。リポジトリ側でディレクトリ構成が変わった場合
+(リンク先が切れた場合)のみ、`git pull` 後にインストーラを再実行してください。
 
 > マシン・プロジェクト固有の permissions 上書きは、作業するプロジェクト側の
 > `.claude/settings.local.json`(Git 管理外)で行えます。
@@ -144,7 +145,8 @@ Claude Desktop の MCP 設定だけはアカウント同期されないため、
 - Windows: `%APPDATA%\Claude\claude_desktop_config.json`
 
 [`desktop/claude_desktop_config.example.json`](desktop/claude_desktop_config.example.json) を
-コピーして各マシンのパスに合わせて編集してください。
+上記パスにコピーし、MCP サーバーの引数(許可ディレクトリ等)を各マシンに合わせて
+編集してください(JSON にはコメントを書けないため、説明はこの README に置いています)。
 
 ### 4. プロジェクト単位で MCP を共有したい場合
 

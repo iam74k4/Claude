@@ -1,4 +1,4 @@
-# Claude Code 設定インストーラ (Windows)
+﻿# Claude Code 設定インストーラ (Windows)
 # %USERPROFILE%\.claude\ 内の対象ファイルを、このリポジトリへのシンボリックリンクに置き換える。
 # シンボリックリンク作成には「開発者モード」有効化か管理者権限が必要。
 # どちらも使えない場合はコピーにフォールバックする(その場合 pull 後に再実行が必要)。
@@ -18,6 +18,15 @@ $Targets = @(
     @{ Src = "home\.claude\hooks";         Dst = "hooks" }
 )
 
+# シンボリックリンクの Target は PowerShell のバージョンによって '\\?\' 接頭辞付きで
+# 返ることがあるため、正規化してから比較する(冪等判定のため)
+function Get-LinkTarget($item) {
+    if (-not $item -or $item.LinkType -ne "SymbolicLink") { return $null }
+    $target = @($item.Target)[0]
+    if (-not $target) { return $null }
+    return ($target -replace '^\\\\\?\\', '')
+}
+
 New-Item -ItemType Directory -Force -Path $ClaudeDir | Out-Null
 
 foreach ($t in $Targets) {
@@ -30,7 +39,8 @@ foreach ($t in $Targets) {
     }
 
     $existing = Get-Item $dst -ErrorAction SilentlyContinue
-    if ($existing -and $existing.LinkType -eq "SymbolicLink" -and $existing.Target -eq $src) {
+    $linkTarget = Get-LinkTarget $existing
+    if ($linkTarget -and ($linkTarget -ieq $src)) {
         Write-Host "ok:   $dst (設定済み)"
         continue
     }
@@ -52,7 +62,7 @@ foreach ($t in $Targets) {
 }
 
 Write-Host ""
-Write-Host "完了。以後は 'git -C $RepoDir pull' で設定が同期されます(コピーの場合は本スクリプトを再実行)。"
+Write-Host "完了。設定の変更は次のセッション開始時に自動反映されます(コピーの場合は pull 後に本スクリプトを再実行)。"
 if (Test-Path $BackupDir) {
     Write-Host "既存ファイルのバックアップ: $BackupDir"
 }
