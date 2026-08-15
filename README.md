@@ -1,1 +1,110 @@
-# Claude
+# Claude グローバル設定リポジトリ
+
+Claude を使う全環境(Claude Code / Claude Desktop / iOS アプリ)の設定を、
+この 1 つのリポジトリで一元管理するためのリポジトリです。
+
+## まず理解しておくこと:設定は 2 系統ある
+
+| 系統 | 対象 | 共有方法 |
+|------|------|----------|
+| **ファイルベース設定** (`~/.claude/`) | Claude Code CLI / VS Code 拡張 (Windows・macOS 共通) | ✅ この Git リポジトリで共有できる |
+| **アカウント側設定** (claude.ai) | iOS アプリ / Claude Desktop / Web | ⚙️ claude.ai のアカウントに保存され、**自動で全デバイスに同期**される(ファイルでは管理できない) |
+
+つまり:
+
+- **Claude Code (VS Code / CLI)** → このリポジトリの `claude/` を各マシンにインストールすれば共有完了
+- **iOS アプリ / Claude Desktop** → claude.ai の「設定 → プロファイル → 個人設定」に一度書けば全デバイスに同期される。
+  貼り付ける内容のマスターを [`claude-ai/preferences.md`](claude-ai/preferences.md) としてこのリポジトリで管理する
+- **Claude Desktop の MCP サーバー** (`claude_desktop_config.json`) だけは同期されないので、
+  [`desktop/claude_desktop_config.example.json`](desktop/claude_desktop_config.example.json) を各マシンに手動配置する
+
+## リポジトリ構成
+
+```
+claude/                      ← ~/.claude/ に配置する内容(Claude Code 用)
+  CLAUDE.md                  ← ユーザーレベルのグローバルメモリ(全プロジェクト共通の指示)
+  settings.json              ← 共有する settings(permissions など)
+  commands/                  ← カスタムスラッシュコマンド
+    review.md
+claude-ai/
+  preferences.md             ← claude.ai(iOS/Desktop/Web)に貼る個人設定のマスター
+desktop/
+  claude_desktop_config.example.json  ← Claude Desktop の MCP 設定の雛形
+scripts/
+  install.sh                 ← macOS / Linux 用インストーラ(シンボリックリンク作成)
+  install.ps1                ← Windows 用インストーラ
+```
+
+## セットアップ手順
+
+### 1. Claude Code(VS Code 拡張 / CLI) — Windows・macOS 共通
+
+VS Code 拡張と CLI は同じ `~/.claude/`(Windows は `%USERPROFILE%\.claude\`)を読むので、
+一度設定すれば両方に効きます。
+
+**macOS / Linux:**
+
+```bash
+git clone https://github.com/iam74k4/claude.git ~/claude-config
+~/claude-config/scripts/install.sh
+```
+
+**Windows (PowerShell):**
+
+```powershell
+git clone https://github.com/iam74k4/claude.git $HOME\claude-config
+powershell -ExecutionPolicy Bypass -File $HOME\claude-config\scripts\install.ps1
+```
+
+スクリプトは `~/.claude/` 内の `CLAUDE.md` / `settings.json` / `commands/` を
+このリポジトリへのシンボリックリンクに置き換えます(既存ファイルはバックアップされます)。
+以後、設定を変えたらこのリポジトリで commit → 他マシンで `git pull` するだけで同期されます。
+
+> マシン固有の設定(そのマシンだけの permissions 等)は `~/.claude/settings.local.json`
+> に書けばリポジトリ管理外にできます。
+
+### 2. iOS アプリ / Claude Desktop / claude.ai Web
+
+これらはローカルファイルを読みません。設定はすべてアカウント側です。
+
+1. [`claude-ai/preferences.md`](claude-ai/preferences.md) の内容をコピー
+2. claude.ai(Web か Desktop)の **設定 → プロファイル → 「Claude に覚えておいてほしいこと(個人設定)」** に貼り付け
+3. 保存すると **iOS / Desktop / Web すべてに自動同期** される
+
+内容を変えたいときは、まずこのリポジトリの `preferences.md` を更新してから claude.ai に貼り直します
+(リポジトリ = マスター、claude.ai = 反映先、という運用)。
+
+### 3. Claude Desktop の MCP サーバー(任意)
+
+Claude Desktop の MCP 設定だけはアカウント同期されないため、各マシンで配置します。
+
+- macOS: `~/Library/Application Support/Claude/claude_desktop_config.json`
+- Windows: `%APPDATA%\Claude\claude_desktop_config.json`
+
+[`desktop/claude_desktop_config.example.json`](desktop/claude_desktop_config.example.json) を
+コピーして各マシンのパスに合わせて編集してください。
+
+### 4. プロジェクト単位で MCP を共有したい場合
+
+作業リポジトリのルートに `.mcp.json` をコミットすると、そのリポジトリを開いた
+Claude Code 全員(全マシン)で MCP サーバーが共有されます。ユーザー全体で共有したい
+MCP は `claude mcp add --scope user` で追加します(`~/.claude.json` に保存。
+認証情報を含むことがあるためこのリポジトリでは管理しません)。
+
+## 各環境の対応表(何がどこで効くか)
+
+| 設定 | Claude Code (VSCode/CLI) | Claude Desktop | iOS アプリ |
+|------|:---:|:---:|:---:|
+| `~/.claude/CLAUDE.md`(グローバルメモリ) | ✅ | ❌ | ❌ |
+| `~/.claude/settings.json` | ✅ | ❌ | ❌ |
+| カスタムコマンド / スキル(`~/.claude/`) | ✅ | ❌ | ❌ |
+| claude.ai の個人設定(プロファイル) | ❌ | ✅(同期) | ✅(同期) |
+| claude.ai の Projects / メモリ / コネクタ | ❌ | ✅(同期) | ✅(同期) |
+| `claude_desktop_config.json`(MCP) | ❌ | ✅(手動配置) | ❌ |
+| リポジトリの `CLAUDE.md` / `.mcp.json` | ✅ | ❌ | ❌ |
+
+## 日常の運用フロー
+
+1. 設定を変えたくなったら、このリポジトリを編集して commit & push
+2. Claude Code を使う各マシンでは `git pull`(シンボリックリンクなので pull だけで反映)
+3. `claude-ai/preferences.md` を変えた場合のみ、claude.ai の設定画面に貼り直す
