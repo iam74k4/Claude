@@ -12,7 +12,7 @@ Claude を使う全環境(Claude Code / Claude Desktop / iOS アプリ)の設定
 
 つまり:
 
-- **Claude Code (VS Code / CLI)** → このリポジトリの `claude/` を各マシンにインストールすれば共有完了
+- **Claude Code (VS Code / CLI)** → このリポジトリの `dot-claude/` を各マシンにインストールすれば共有完了
 - **iOS アプリ / Claude Desktop** → claude.ai の「設定 → プロファイル → 個人設定」に一度書けば全デバイスに同期される。
   貼り付ける内容のマスターを [`claude-ai/preferences.md`](claude-ai/preferences.md) としてこのリポジトリで管理する
 - **Claude Desktop の MCP サーバー** (`claude_desktop_config.json`) だけは同期されないので、
@@ -21,7 +21,8 @@ Claude を使う全環境(Claude Code / Claude Desktop / iOS アプリ)の設定
 ## リポジトリ構成
 
 ```
-claude/                      ← ~/.claude/ に配置する内容(Claude Code 用)
+CLAUDE.md                    ← このリポジトリを Claude Code で開いたとき用の指示
+dot-claude/                  ← ~/.claude/ に配置する内容(Claude Code 用)
   CLAUDE.md                  ← ユーザーレベルのグローバルメモリ(全プロジェクト共通の指示)
   settings.json              ← 共有する settings(permissions など)
   rules/                     ← 常時適用ルール(CLAUDE.md からインポートされる)
@@ -40,23 +41,31 @@ scripts/
   install.ps1                ← Windows 用インストーラ
 ```
 
+> `dot-claude/` という名前は「`~/.claude/` に置かれるもの」を表す(dotfiles の慣習)。
+> リポジトリ名の `Claude` や、アカウント設定の `claude-ai/` との混同を避けるための命名。
+
 ## ルールとスキルの仕組み(Main workspace として常時参照される理由)
 
 インストーラが `~/.claude/` にリンクを張ることで、**どのリポジトリで開発していても**
 Claude Code は常にこのリポジトリの内容を参照します:
 
-- **`claude/rules/*.md`(ルール)** — `claude/CLAUDE.md` が `@~/.claude/rules/git.md` の形で
+- **`dot-claude/rules/*.md`(ルール)** — `dot-claude/CLAUDE.md` が `@~/.claude/rules/git.md` の形で
   インポートしており、**全プロジェクトのすべての会話に常時読み込まれる**。
   「常に守ってほしい規約」はここに書く。
-- **`claude/skills/<name>/SKILL.md`(スキル)** — 常時読み込まれるのは説明文だけで、
+- **`dot-claude/skills/<name>/SKILL.md`(スキル)** — 常時読み込まれるのは説明文だけで、
   **該当するタスク(コミット作成、PR 作成など)のときに本文が自動で読み込まれる**。
   「特定の作業の詳しい手順」はここに書く。
-- ルールを増やすときは `claude/rules/` に Markdown を追加し、`claude/CLAUDE.md` に
+- ルールを増やすときは `dot-claude/rules/` に Markdown を追加し、`dot-claude/CLAUDE.md` に
   `@~/.claude/rules/<ファイル名>.md` の 1 行を足す。
-- スキルを増やすときは `claude/skills/<スキル名>/SKILL.md` を追加するだけでよい
+- スキルを増やすときは `dot-claude/skills/<スキル名>/SKILL.md` を追加するだけでよい
   (frontmatter の `description` がいつ発動するかの条件になる)。
 
 いずれも commit → 各マシンで `git pull` すれば即座に全プロジェクトへ反映されます。
+
+> **設計上の割り切り**: `rules/` `skills/` `commands/` はディレクトリごとシンボリックリンク
+> するため、マシン固有(Git 管理外)のスキルやコマンドを置く場所は意図的にありません。
+> すべてこのリポジトリで管理します。マシン固有にできるのは `~/.claude/settings.local.json`
+> (permissions 等の上書き)だけです。
 
 ## セットアップ手順
 
@@ -79,9 +88,11 @@ git clone https://github.com/iam74k4/claude.git $HOME\claude-config
 powershell -ExecutionPolicy Bypass -File $HOME\claude-config\scripts\install.ps1
 ```
 
-スクリプトは `~/.claude/` 内の `CLAUDE.md` / `settings.json` / `commands/` を
-このリポジトリへのシンボリックリンクに置き換えます(既存ファイルはバックアップされます)。
+スクリプトは `~/.claude/` 内の `CLAUDE.md` / `settings.json` / `commands/` / `rules/` /
+`skills/` をこのリポジトリへのシンボリックリンクに置き換えます(既存ファイルはバックアップされます)。
 以後、設定を変えたらこのリポジトリで commit → 他マシンで `git pull` するだけで同期されます。
+リポジトリ側でディレクトリ構成が変わった場合(リンク先が切れた場合)は、
+`git pull` 後にインストーラを再実行すればリンクが張り直されます。
 
 > マシン固有の設定(そのマシンだけの permissions 等)は `~/.claude/settings.local.json`
 > に書けばリポジトリ管理外にできます。
