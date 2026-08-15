@@ -5,10 +5,11 @@ Claude の全環境設定を一元管理する dotfiles リポジトリ。**こ�
 
 ## 構造と反映経路
 
-- `dot-claude/` — `~/.claude/` の実体。インストーラがシンボリックリンクを張るため、
+- `.claude/` — `~/.claude/` の実体。インストーラがシンボリックリンクを張るため、
   ここを編集して commit → 各マシンで `git pull` するだけで反映される。
+  このリポジトリを開いている間はプロジェクト設定としても二重に読み込まれるが、既知の仕様として許容している。
   - `CLAUDE.md` はユーザーレベルのグローバルメモリ(このファイルとは別物)
-  - `rules/*.md` は常時適用ルール。`dot-claude/CLAUDE.md` からの `@~/.claude/rules/<name>.md`
+  - `rules/*.md` は常時適用ルール。`.claude/CLAUDE.md` からの `@~/.claude/rules/<name>.md`
     インポートで読み込まれるため、**rules にファイルを足したら必ずインポート行も足す**
   - `skills/<name>/SKILL.md` はタスク発動型スキル。frontmatter の `description` が発動条件
   - `agents/<name>.md` はカスタムサブエージェント。frontmatter(`name` / `description` /
@@ -18,7 +19,7 @@ Claude の全環境設定を一元管理する dotfiles リポジトリ。**こ�
   自動反映されない。**変更後は claude.ai のプロファイル設定への貼り直しが必要**な旨を
   ユーザーに案内すること
 - `desktop/` — Claude Desktop の MCP 雛形。各マシン手動配置
-- `scripts/` — インストーラ。`dot-claude/` 直下に配布物を追加した場合は
+- `scripts/` — インストーラ。`.claude/` 直下に配布物を追加した場合は
   install.sh と install.ps1 の両方の TARGETS リストに追記すること
 
 ## 編集時のルール

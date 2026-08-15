@@ -12,7 +12,7 @@ Claude を使う全環境(Claude Code / Claude Desktop / iOS アプリ)の設定
 
 つまり:
 
-- **Claude Code (VS Code / CLI)** → このリポジトリの `dot-claude/` を各マシンにインストールすれば共有完了
+- **Claude Code (VS Code / CLI)** → このリポジトリの `.claude/` を各マシンにインストールすれば共有完了
 - **iOS アプリ / Claude Desktop** → claude.ai の「設定 → プロファイル → 個人設定」に一度書けば全デバイスに同期される。
   貼り付ける内容のマスターを [`claude-ai/preferences.md`](claude-ai/preferences.md) としてこのリポジトリで管理する
 - **Claude Desktop の MCP サーバー** (`claude_desktop_config.json`) だけは同期されないので、
@@ -22,7 +22,7 @@ Claude を使う全環境(Claude Code / Claude Desktop / iOS アプリ)の設定
 
 ```
 CLAUDE.md                    ← このリポジトリを Claude Code で開いたとき用の指示
-dot-claude/                  ← ~/.claude/ に配置する内容(Claude Code 用)
+.claude/                     ← ~/.claude/ に配置する内容(Claude Code 用)
   CLAUDE.md                  ← ユーザーレベルのグローバルメモリ(全プロジェクト共通の指示)
   settings.json              ← 共有する settings(permissions など)
   rules/                     ← 常時適用ルール(CLAUDE.md からインポートされる)
@@ -45,25 +45,29 @@ scripts/
   install.ps1                ← Windows 用インストーラ
 ```
 
-> `dot-claude/` という名前は「`~/.claude/` に置かれるもの」を表す(dotfiles の慣習)。
-> リポジトリ名の `Claude` や、アカウント設定の `claude-ai/` との混同を避けるための命名。
+> `.claude/` は配置先の `~/.claude/` と同名にしてある(中身がそのままリンクされる)。
+> 隠しディレクトリなので、Finder / エクスプローラーで見るときは隠しファイル表示を有効にすること。
+>
+> **既知の仕様**: リポジトリ直下の `.claude/` は Claude Code の「プロジェクト設定」ディレクトリ
+> でもあるため、**このリポジトリ自体を Claude Code で開いたときだけ**、中身がユーザーレベルと
+> プロジェクトレベルの二重で読み込まれる(コマンド等が重複表示される)。実害はなく許容している。
 
 ## ルールとスキルの仕組み(Main workspace として常時参照される理由)
 
 インストーラが `~/.claude/` にリンクを張ることで、**どのリポジトリで開発していても**
 Claude Code は常にこのリポジトリの内容を参照します:
 
-- **`dot-claude/rules/*.md`(ルール)** — `dot-claude/CLAUDE.md` が `@~/.claude/rules/git.md` の形で
+- **`.claude/rules/*.md`(ルール)** — `.claude/CLAUDE.md` が `@~/.claude/rules/git.md` の形で
   インポートしており、**全プロジェクトのすべての会話に常時読み込まれる**。
   「常に守ってほしい規約」はここに書く。
-- **`dot-claude/skills/<name>/SKILL.md`(スキル)** — 常時読み込まれるのは説明文だけで、
+- **`.claude/skills/<name>/SKILL.md`(スキル)** — 常時読み込まれるのは説明文だけで、
   **該当するタスク(コミット作成、PR 作成など)のときに本文が自動で読み込まれる**。
   「特定の作業の詳しい手順」はここに書く。
-- ルールを増やすときは `dot-claude/rules/` に Markdown を追加し、`dot-claude/CLAUDE.md` に
+- ルールを増やすときは `.claude/rules/` に Markdown を追加し、`.claude/CLAUDE.md` に
   `@~/.claude/rules/<ファイル名>.md` の 1 行を足す。
-- スキルを増やすときは `dot-claude/skills/<スキル名>/SKILL.md` を追加するだけでよい
+- スキルを増やすときは `.claude/skills/<スキル名>/SKILL.md` を追加するだけでよい
   (frontmatter の `description` がいつ発動するかの条件になる)。
-- **`dot-claude/agents/<name>.md`(サブエージェント)** — 特定の役割(レビュー、デバッグ等)を
+- **`.claude/agents/<name>.md`(サブエージェント)** — 特定の役割(レビュー、デバッグ等)を
   **独立したコンテキストで実行する専門エージェント**。メイン会話を汚さずに重い調査・検証を
   任せられる。frontmatter の `description` に該当する作業が来ると自動で委譲されるほか、
   「code-reviewer でレビューして」のように名指しでも呼べる。`tools` で使えるツールを
