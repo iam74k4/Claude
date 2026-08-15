@@ -10,12 +10,12 @@ BACKUP_DIR="$CLAUDE_DIR/backup-$(date +%Y%m%d-%H%M%S)"
 
 # リンク対象: リポジトリ内パス → ~/.claude/ 内での名前
 TARGETS=(
-  ".claude/CLAUDE.md:CLAUDE.md"
-  ".claude/settings.json:settings.json"
-  ".claude/commands:commands"
-  ".claude/rules:rules"
-  ".claude/skills:skills"
-  ".claude/agents:agents"
+  "home/.claude/CLAUDE.md:CLAUDE.md"
+  "home/.claude/settings.json:settings.json"
+  "home/.claude/commands:commands"
+  "home/.claude/rules:rules"
+  "home/.claude/skills:skills"
+  "home/.claude/agents:agents"
 )
 
 mkdir -p "$CLAUDE_DIR"

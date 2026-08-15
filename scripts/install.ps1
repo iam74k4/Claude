@@ -9,12 +9,12 @@ $ClaudeDir = if ($env:CLAUDE_CONFIG_DIR) { $env:CLAUDE_CONFIG_DIR } else { Join-
 $BackupDir = Join-Path $ClaudeDir ("backup-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
 
 $Targets = @(
-    @{ Src = ".claude\CLAUDE.md";     Dst = "CLAUDE.md" },
-    @{ Src = ".claude\settings.json"; Dst = "settings.json" },
-    @{ Src = ".claude\commands";      Dst = "commands" },
-    @{ Src = ".claude\rules";         Dst = "rules" },
-    @{ Src = ".claude\skills";        Dst = "skills" },
-    @{ Src = ".claude\agents";        Dst = "agents" }
+    @{ Src = "home\.claude\CLAUDE.md";     Dst = "CLAUDE.md" },
+    @{ Src = "home\.claude\settings.json"; Dst = "settings.json" },
+    @{ Src = "home\.claude\commands";      Dst = "commands" },
+    @{ Src = "home\.claude\rules";         Dst = "rules" },
+    @{ Src = "home\.claude\skills";        Dst = "skills" },
+    @{ Src = "home\.claude\agents";        Dst = "agents" }
 )
 
 New-Item -ItemType Directory -Force -Path $ClaudeDir | Out-Null
