@@ -16,6 +16,9 @@ Claude の全環境設定を一元管理する dotfiles リポジトリ。**こ�
   - `agents/<name>.md` はカスタムサブエージェント。frontmatter(`name` / `description` /
     `tools`)+ 本文がシステムプロンプト。役割に不要なツールは `tools` で絞ること
     (例: レビュー役に Edit を与えない)
+  - `hooks/` はフックスクリプト置き場。`sync-config-repo.sh` が SessionStart で
+    このリポジトリを自動 pull する(settings.json の hooks 定義とセット)。
+    SessionStart フックの stdout はコンテキストに注入されるため、スクリプトは無出力を保つこと
 - `claude-ai/preferences.md` — claude.ai(iOS/Desktop/Web)用マスター。編集しても
   自動反映されない。**変更後は claude.ai のプロファイル設定への貼り直しが必要**な旨を
   ユーザーに案内すること

@@ -16,6 +16,7 @@ TARGETS=(
   "home/.claude/rules:rules"
   "home/.claude/skills:skills"
   "home/.claude/agents:agents"
+  "home/.claude/hooks:hooks"
 )
 
 mkdir -p "$CLAUDE_DIR"

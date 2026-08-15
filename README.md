@@ -37,6 +37,8 @@ home/                        ← ホームディレクトリのミラー(この�
       test-runner.md         ← テスト実行・失敗分析・修正
     commands/                ← カスタムスラッシュコマンド
       review.md
+    hooks/                   ← Claude Code のフックスクリプト
+      sync-config-repo.sh    ← セッション開始時にこのリポジトリを自動 git pull
 claude-ai/
   preferences.md             ← claude.ai(iOS/Desktop/Web)に貼る個人設定のマスター
 desktop/
@@ -75,10 +77,23 @@ Claude Code は常にこのリポジトリの内容を参照します:
 
 いずれも commit → 各マシンで `git pull` すれば即座に全プロジェクトへ反映されます。
 
-> **設計上の割り切り**: `rules/` `skills/` `agents/` `commands/` はディレクトリごとシンボリックリンク
-> するため、マシン固有(Git 管理外)のスキルやコマンドを置く場所は意図的にありません。
-> すべてこのリポジトリで管理します。マシン固有にできるのは `~/.claude/settings.local.json`
-> (permissions 等の上書き)だけです。
+> **設計上の割り切り**: `rules/` `skills/` `agents/` `commands/` `hooks/` はディレクトリごと
+> シンボリックリンクするため、マシン固有(Git 管理外)のスキルやコマンドを置く場所は
+> 意図的にありません。すべてこのリポジトリで管理します。マシン固有の上書きが必要な場合は、
+> 作業する側のプロジェクトに `.claude/settings.local.json`(プロジェクト単位・Git 管理外)を
+> 置きます(ユーザーレベルの settings.local.json という仕組みは存在しません)。
+
+## 自動同期(常に最新のルールが参照される仕組み)
+
+`settings.json` に **SessionStart フック**を定義してあり、Claude Code のセッションを
+開始するたびに `hooks/sync-config-repo.sh` が走って**このリポジトリを自動で `git pull`** します。
+どのリポジトリで作業を始めても、その時点の最新ルール・スキルが読み込まれます。
+
+- リポジトリの場所は `~/.claude/CLAUDE.md` のリンク先から自動で特定するため、クローン先は自由
+- オフライン時や取得失敗時は黙って何もしない(セッション開始を妨げない)
+- ローカルに未コミットの変更がある場合は `--ff-only` により安全側で何もしない
+- インストーラがコピー運用にフォールバックしたマシン(シンボリックリンク不可)では
+  自動同期は働かないため、手動で `git pull` + インストーラ再実行が必要
 
 ## セットアップ手順
 
@@ -107,8 +122,8 @@ powershell -ExecutionPolicy Bypass -File $HOME\claude-config\scripts\install.ps1
 リポジトリ側でディレクトリ構成が変わった場合(リンク先が切れた場合)は、
 `git pull` 後にインストーラを再実行すればリンクが張り直されます。
 
-> マシン固有の設定(そのマシンだけの permissions 等)は `~/.claude/settings.local.json`
-> に書けばリポジトリ管理外にできます。
+> マシン・プロジェクト固有の permissions 上書きは、作業するプロジェクト側の
+> `.claude/settings.local.json`(Git 管理外)で行えます。
 
 ### 2. iOS アプリ / Claude Desktop / claude.ai Web
 
@@ -153,5 +168,7 @@ MCP は `claude mcp add --scope user` で追加します(`~/.claude.json` に保
 ## 日常の運用フロー
 
 1. 設定を変えたくなったら、このリポジトリを編集して commit & push
-2. Claude Code を使う各マシンでは `git pull`(シンボリックリンクなので pull だけで反映)
+2. 他のマシンには**次のセッション開始時に自動反映**される(SessionStart フックが pull する)。
+   すぐ反映したい場合や、リポジトリのディレクトリ構成が変わった場合のみ、
+   手動で `git pull`(+ 構成変更時はインストーラ再実行)
 3. `claude-ai/preferences.md` を変えた場合のみ、claude.ai の設定画面に貼り直す

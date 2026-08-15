@@ -14,7 +14,8 @@ $Targets = @(
     @{ Src = "home\.claude\commands";      Dst = "commands" },
     @{ Src = "home\.claude\rules";         Dst = "rules" },
     @{ Src = "home\.claude\skills";        Dst = "skills" },
-    @{ Src = "home\.claude\agents";        Dst = "agents" }
+    @{ Src = "home\.claude\agents";        Dst = "agents" },
+    @{ Src = "home\.claude\hooks";         Dst = "hooks" }
 )
 
 New-Item -ItemType Directory -Force -Path $ClaudeDir | Out-Null

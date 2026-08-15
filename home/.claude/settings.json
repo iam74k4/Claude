@@ -10,5 +10,19 @@
       "Read(**)"
     ],
     "deny": []
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_CONFIG_DIR:-$HOME/.claude}/hooks/sync-config-repo.sh\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
   }
 }
