@@ -1,0 +1,13 @@
+{
+  "_comment": "Claude Desktop の MCP 設定の雛形。macOS: ~/Library/Application Support/Claude/claude_desktop_config.json / Windows: %APPDATA%\\Claude\\claude_desktop_config.json に配置する。パスは各マシンに合わせて書き換えること。",
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@modelcontextprotocol/server-filesystem",
+        "/path/to/allowed/directory"
+      ]
+    }
+  }
+}
